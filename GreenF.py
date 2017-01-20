@@ -6,7 +6,7 @@ class GF:
         self.alpha = complex(alpha, 0)
         self.beta  = complex(beta,  0)
         self.B0    = complex(B0,    0)
-        self.E_so  = (alpha**2 + beta**2)
+        self.E_so  = self.m * (alpha**2 + beta**2)
         self.E0    = - (self.E_so**2 + self.B0**2)/(2 * self.E_so)
 
 
@@ -39,3 +39,6 @@ class GF:
     def D(self, z, k):
         ksq_2m = (k**2)/(2.0 * self.m)
         return (z - ksq_2m)**2 - 2 * self.E_so * ksq_2m - self.B0**2
+
+    def D_prim(self, z, k):
+        return k**3/(self.m**2) - 2.0 * k/self.m * (z + self.E_so)
