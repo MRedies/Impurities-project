@@ -1,11 +1,12 @@
 import numpy as np
 import scipy.special as sf
 class GF:
-    def __init__(self, m, alpha, beta, B0):
+    def __init__(self, m, alpha, beta, B0, eta = 1e-4):
         self.m     = complex(m,     0)
         self.alpha = complex(alpha, 0)
         self.beta  = complex(beta,  0)
         self.B0    = complex(B0,    0)
+        self.eta   = eta
         self.E_so  = self.m * (alpha**2 + beta**2)
         self.E0    = - (self.E_so**2 + self.B0**2)/(2 * self.E_so)
 
@@ -49,6 +50,11 @@ class GF:
 
     def R_cross_z(self, R):
         return np.array([-R[1], R[0]])
+
+    def N(self, E):
+        z = E + 1j * self.eta
+        R = np.array([1e-6, 1e-6])
+        return - 1.0/np.pi * np.imag( np.trace(self.G(R, z)))
 
     def G(self, R, z):
         k1, k2 = self.find_k(z)
