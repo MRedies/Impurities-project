@@ -1,5 +1,5 @@
 import numpy as np
-
+import scipy.special as sf
 class GF:
     def __init__(self, m, alpha, beta, B0):
         self.m     = complex(m,     0)
@@ -9,6 +9,10 @@ class GF:
         self.E_so  = self.m * (alpha**2 + beta**2)
         self.E0    = - (self.E_so**2 + self.B0**2)/(2 * self.E_so)
 
+        self.sigma_0 = np.identity(2)
+        self.sigma_x = np.array([[0, 1],[1, 0]])
+        self.sigma_y = np.array([[0, -1j],[1j, 0]])
+        self.sigma_z = np.array([[1, 0],[0, -1]])
 
     def find_k(self, z):
         E   = np.real(z)
@@ -42,3 +46,20 @@ class GF:
 
     def D_prim(self, z, k):
         return k**3/(self.m**2) - 2.0 * k/self.m * (z + self.E_so)
+
+    def R_cross_z(self, R):
+        return np.array([-R[1], R[0]])
+
+    def G(self, R, z):
+        k1, k2 = self.find_k(z)
+        vec = self.alpha * self.R_cross_z(R) + self.beta * R
+        res  = 0.5 * 1j * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(0, k1 * np.abs(R)) \
+                * (( z - k1*k1/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
+        res -= 0.5      * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(1, k1 * np.abs(R)) \
+                * k1 * (vec[0] * self.sigma_x + vec[1] * self.sigma_y)
+        res += 0.5 * 1j * np.abs(k2)/self.D_prim(z, k2) * sf.hankel1(0, k2 * np.abs(R)) \
+                * (( z - k2*k2/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
+        res -= 0.5      * np.abs(k2)/self.D_prim(z, k2) * sf.hankel1(1, k2 * np.abs(R)) \
+                * k2 * (vec[0] * self.sigma_x + vec[1] * self.sigma_y)
+        return res
+
