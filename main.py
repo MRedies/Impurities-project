@@ -4,15 +4,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-print "please select variable set:\n"
-print "0) m=1,  alpha=0, beta=0, B0=1"
-print "1) m=1,  alpha=1, beta=0, B0=0"
-print "2) m=1,  alpha=0, beta=1, B0=0"
-print "3) m=10, alpha=1, beta=0, B0=0"
-print "4) m=10, alpha=1, beta=0, B0=1"
+print("please select variable set:\n")
+print("0) m=1,  alpha=0, beta=0, B0=1")
+print("1) m=1,  alpha=1, beta=0, B0=0")
+print("2) m=1,  alpha=0, beta=1, B0=0")
+print("3) m=10, alpha=1, beta=0, B0=0")
+print("4) m=10, alpha=1, beta=0, B0=1")
 
 #parameter
-i=int(raw_input("set="))
+i=int(input("set="))
 
 
 
@@ -32,6 +32,8 @@ for j in range(E.shape[0]):
 	DOS_N[j] = b.N(E[j])
 plt.plot(E,DOS_G,label='green')
 plt.plot(E,DOS_N,label="check")
+
+print("alhpa %g"%(sets[i,1]))
 
 plt.title("m="+str(sets[i,0])+"; alpha="+str(sets[i,1])+"; beta="+str(sets[i,2])+"; B0="+str(sets[i,3]))
 plt.ylim([-2,7])
