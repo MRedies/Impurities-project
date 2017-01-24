@@ -1,18 +1,39 @@
 import GreenF
+import DensityN
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-E = np.linspace(-10, 10, 300)
-for pot in np.arange(0,10, 1):
-    a = GreenF.GF(1.0, 10**(-pot), 0.0, 1.0)
-    z = 4.0 + 1e-5 * 1j
-    k1, k2 = a.find_k(z)
+print "please select variable set:\n"
+print "0) m=1,  alpha=0, beta=0, B0=1"
+print "1) m=1,  alpha=1, beta=0, B0=0"
+print "2) m=1,  alpha=0, beta=1, B0=0"
+print "3) m=10, alpha=1, beta=0, B0=0"
+print "4) m=10, alpha=1, beta=0, B0=1"
 
-    DOS = np.zeros(E.shape)
-    for i in range(E.shape[0]):
-        DOS[i] = a.N(E[i])
+#parameter
+i=int(raw_input("set="))
 
-    plt.plot(E, DOS, label=str(-pot))
+
+
+
+
+E = np.linspace(0.01, 8, 300)
+sets = np.array([[1.0,1e-4,0.0,1.0],  [1.0,1.0,0.0,0.0],		[1.0,0.0,1.0,0.0],		[10.0,1.0,0.0,0.0],		[10.0,1.0,0.0,1.0]])
+
+
+
+a = GreenF.GF(   sets[i,0], sets[i,1], sets[i,2], sets[i,3])
+b = DensityN.DOS(sets[i,0], sets[i,1], sets[i,2], sets[i,3])
+DOS_G = np.zeros(E.shape)
+DOS_N = np.zeros(E.shape)
+for j in range(E.shape[0]):
+	DOS_G[j] = a.N(E[j])
+	DOS_N[j] = b.N(E[j])
+plt.plot(E,DOS_G,label='green')
+plt.plot(E,DOS_N,label="check")
+
+plt.title("m="+str(sets[i,0])+"; alpha="+str(sets[i,1])+"; beta="+str(sets[i,2])+"; B0="+str(sets[i,3]))
+plt.ylim([-2,7])
 plt.legend()
 plt.show()
