@@ -18,7 +18,7 @@ i=int(input("set="))
 
 
 
-E = np.linspace(0.01, 8, 300)
+E = np.linspace(-2, 8, 100)
 sets = np.array([[1.0,1e-4,0.0,1.0],  [1.0,1.0,0.0,0.0],		[1.0,0.0,1.0,0.0],		[10.0,1.0,0.0,0.0],		[10.0,1.0,0.0,1.0]])
 
 
@@ -33,7 +33,6 @@ for j in range(E.shape[0]):
 plt.plot(E,DOS_G,label='green')
 plt.plot(E,DOS_N,label="check")
 
-print("alhpa %g"%(sets[i,1]))
 
 plt.title("m="+str(sets[i,0])+"; alpha="+str(sets[i,1])+"; beta="+str(sets[i,2])+"; B0="+str(sets[i,3]))
 plt.ylim([-2,7])

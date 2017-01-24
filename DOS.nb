@@ -1,0 +1,283 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      8730,        273]
+NotebookOptionsPosition[      8338,        255]
+NotebookOutlinePosition[      8676,        270]
+CellTagsIndexPosition[      8633,        267]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"Eplus", "[", "k_", "]"}], ":=", " ", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"k", "^", "2"}], "/", 
+       RowBox[{"(", 
+        RowBox[{"2", "*", "m"}], ")"}]}], "+", 
+      RowBox[{"Sqrt", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"\[Alpha]", "^", "2"}], "+", 
+           RowBox[{"\[Beta]", "^", "2"}]}], ")"}], "*", 
+         RowBox[{"k", "^", "2"}]}], "+", 
+        RowBox[{"B", "^", "2"}]}], "]"}]}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Eminu", "[", "k_", "]"}], ":=", " ", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"k", "^", "2"}], "/", 
+       RowBox[{"(", 
+        RowBox[{"2", "*", "m"}], ")"}]}], "-", 
+      RowBox[{"Sqrt", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"\[Alpha]", "^", "2"}], "+", 
+           RowBox[{"\[Beta]", "^", "2"}]}], ")"}], "*", 
+         RowBox[{"k", "^", "2"}]}], "+", 
+        RowBox[{"B", "^", "2"}]}], "]"}]}]}], ";"}], "\n", "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Gplus", "[", "k_", "]"}], ":=", 
+     RowBox[{"En", "-", " ", 
+      RowBox[{"Eplus", "[", "k", "]"}]}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Gminu", "[", "k_", "]"}], ":=", 
+     RowBox[{"En", "-", 
+      RowBox[{"Eminu", "[", "k", "]"}]}]}], ";"}], "\n", "\n", 
+   RowBox[{"k_plus", "=", 
+    RowBox[{"Solve", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"Gplus", "[", "k", "]"}], "\[Equal]", "0"}], ",", "k"}], 
+     "]"}]}], "\n", 
+   RowBox[{"k_minu", "=", 
+    RowBox[{"Solve", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"Gminu", "[", "k", "]"}], "\[Equal]", "0"}], ",", "k"}], 
+     "]"}]}]}]}]], "Input",
+ CellChangeTimes->{{3.694254059551996*^9, 3.694254071502586*^9}, {
+  3.69425410571031*^9, 3.694254195088828*^9}, {3.694254234563857*^9, 
+  3.6942543992312927`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"k", "\[Rule]", 
+     RowBox[{
+      RowBox[{"-", 
+       SqrtBox["2"]}], " ", 
+      SqrtBox[
+       RowBox[{
+        RowBox[{"En", " ", "m"}], "+", 
+        RowBox[{
+         SuperscriptBox["m", "2"], " ", 
+         SuperscriptBox["\[Alpha]", "2"]}], "+", 
+        RowBox[{
+         SuperscriptBox["m", "2"], " ", 
+         SuperscriptBox["\[Beta]", "2"]}], "-", 
+        SqrtBox[
+         RowBox[{
+          SuperscriptBox["m", "2"], " ", 
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox["B", "2"], "+", 
+            RowBox[{"2", " ", "En", " ", "m", " ", 
+             SuperscriptBox["\[Alpha]", "2"]}], "+", 
+            RowBox[{
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Alpha]", "4"]}], "+", 
+            RowBox[{"2", " ", "En", " ", "m", " ", 
+             SuperscriptBox["\[Beta]", "2"]}], "+", 
+            RowBox[{"2", " ", 
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Alpha]", "2"], " ", 
+             SuperscriptBox["\[Beta]", "2"]}], "+", 
+            RowBox[{
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Beta]", "4"]}]}], ")"}]}]]}]]}]}], "}"}], ",", 
+   
+   RowBox[{"{", 
+    RowBox[{"k", "\[Rule]", 
+     RowBox[{
+      SqrtBox["2"], " ", 
+      SqrtBox[
+       RowBox[{
+        RowBox[{"En", " ", "m"}], "+", 
+        RowBox[{
+         SuperscriptBox["m", "2"], " ", 
+         SuperscriptBox["\[Alpha]", "2"]}], "+", 
+        RowBox[{
+         SuperscriptBox["m", "2"], " ", 
+         SuperscriptBox["\[Beta]", "2"]}], "-", 
+        SqrtBox[
+         RowBox[{
+          SuperscriptBox["m", "2"], " ", 
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox["B", "2"], "+", 
+            RowBox[{"2", " ", "En", " ", "m", " ", 
+             SuperscriptBox["\[Alpha]", "2"]}], "+", 
+            RowBox[{
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Alpha]", "4"]}], "+", 
+            RowBox[{"2", " ", "En", " ", "m", " ", 
+             SuperscriptBox["\[Beta]", "2"]}], "+", 
+            RowBox[{"2", " ", 
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Alpha]", "2"], " ", 
+             SuperscriptBox["\[Beta]", "2"]}], "+", 
+            RowBox[{
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Beta]", "4"]}]}], ")"}]}]]}]]}]}], "}"}], ",", 
+   
+   RowBox[{"{", 
+    RowBox[{"k", "\[Rule]", 
+     RowBox[{
+      RowBox[{"-", 
+       SqrtBox["2"]}], " ", 
+      SqrtBox[
+       RowBox[{
+        RowBox[{"En", " ", "m"}], "+", 
+        RowBox[{
+         SuperscriptBox["m", "2"], " ", 
+         SuperscriptBox["\[Alpha]", "2"]}], "+", 
+        RowBox[{
+         SuperscriptBox["m", "2"], " ", 
+         SuperscriptBox["\[Beta]", "2"]}], "+", 
+        SqrtBox[
+         RowBox[{
+          SuperscriptBox["m", "2"], " ", 
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox["B", "2"], "+", 
+            RowBox[{"2", " ", "En", " ", "m", " ", 
+             SuperscriptBox["\[Alpha]", "2"]}], "+", 
+            RowBox[{
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Alpha]", "4"]}], "+", 
+            RowBox[{"2", " ", "En", " ", "m", " ", 
+             SuperscriptBox["\[Beta]", "2"]}], "+", 
+            RowBox[{"2", " ", 
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Alpha]", "2"], " ", 
+             SuperscriptBox["\[Beta]", "2"]}], "+", 
+            RowBox[{
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Beta]", "4"]}]}], ")"}]}]]}]]}]}], "}"}], ",", 
+   
+   RowBox[{"{", 
+    RowBox[{"k", "\[Rule]", 
+     RowBox[{
+      SqrtBox["2"], " ", 
+      SqrtBox[
+       RowBox[{
+        RowBox[{"En", " ", "m"}], "+", 
+        RowBox[{
+         SuperscriptBox["m", "2"], " ", 
+         SuperscriptBox["\[Alpha]", "2"]}], "+", 
+        RowBox[{
+         SuperscriptBox["m", "2"], " ", 
+         SuperscriptBox["\[Beta]", "2"]}], "+", 
+        SqrtBox[
+         RowBox[{
+          SuperscriptBox["m", "2"], " ", 
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox["B", "2"], "+", 
+            RowBox[{"2", " ", "En", " ", "m", " ", 
+             SuperscriptBox["\[Alpha]", "2"]}], "+", 
+            RowBox[{
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Alpha]", "4"]}], "+", 
+            RowBox[{"2", " ", "En", " ", "m", " ", 
+             SuperscriptBox["\[Beta]", "2"]}], "+", 
+            RowBox[{"2", " ", 
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Alpha]", "2"], " ", 
+             SuperscriptBox["\[Beta]", "2"]}], "+", 
+            RowBox[{
+             SuperscriptBox["m", "2"], " ", 
+             SuperscriptBox["\[Beta]", "4"]}]}], ")"}]}]]}]]}]}], "}"}]}], 
+  "}"}]], "Output",
+ CellChangeTimes->{3.694254391440139*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Solve", "::", "ifun"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Inverse functions are being used by \
+\[NoBreak]\\!\\(Solve\\)\[NoBreak], so some solutions may not be found; use \
+Reduce for complete solution information. \\!\\(\\*ButtonBox[\\\"\
+\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/Solve/ifun\\\", ButtonNote -> \
+\\\"Solve::ifun\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.694254391511816*^9}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{"k", "\[Rule]", 
+    RowBox[{
+     TagBox[
+      SuperscriptBox["Emin", 
+       RowBox[{"(", 
+        RowBox[{"-", "1"}], ")"}]],
+      {InverseFunction, 1, 1},
+      Editable->False], "[", "En", "]"}]}], "}"}], "}"}]], "Output",
+ CellChangeTimes->{3.6942543915298862`*^9}]
+}, Open  ]]
+},
+WindowSize->{1920, 1019},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"10.0 for Linux x86 (64-bit) (September 9, 2014)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 1941, 61, 326, "Input"],
+Cell[2524, 85, 4932, 141, 400, "Output"],
+Cell[7459, 228, 531, 11, 38, "Message"],
+Cell[7993, 241, 329, 11, 82, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+

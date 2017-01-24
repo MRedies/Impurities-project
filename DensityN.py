@@ -38,11 +38,17 @@ class DOS:
 
 
     def N(self,E):
-        #kp = self.kplus(E).real
-        #km = self.kminus(E).real
-        kp = 0.5 * ( np.sign(self.kplus(E).real)  + 1)
-        km = 0.5 * ( np.sign(self.kminus(E).real) + 1)
-        return (	kp*self.NPlusKp(E)  + kp*self.NMinusKp(E)		+ 		km*self.NPlusKm(E) + km*self.NMinusKm(E)	) /(2*np.pi)
+        thres = 0
+        if(np.abs(self.kplus(E).imag)<=thres):
+            kp = 0.5 * (np.sign(self.kplus(E).real) + 1)
+        else:
+            kp= 0
 
+        if(np.abs(self.kminus(E).imag)<=thres):
+            km = 0.5 * (np.sign(self.kminus(E).real) + 1)
+        else:
+            km= 0
+
+        return (    kp*self.NPlusKp(E) + km*self.NMinusKm(E)) /(2*np.pi)
 
 
