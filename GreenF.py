@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.special as sf
 class GF:
-    def __init__(self, m, alpha, beta, B0, eta = 1e-4):
+    def __init__(self, m, alpha, beta, B0, eta = 1e-3):
         self.m     = complex(m,     0)
         self.alpha = complex(alpha, 0)
         self.beta  = complex(beta,  0)
