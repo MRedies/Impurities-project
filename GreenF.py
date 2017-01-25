@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.special as sf
-
+import numpy.linalg as la
 
 class GF:
     def __init__(self, m, alpha, beta, B0, eta = 1e-5, R_to_0 = 1e-6):
@@ -59,15 +59,18 @@ class GF:
 
     def G(self, R, z):
         k1, k2 = self.find_k(z)
-        ZxR = self.alpha * self.z_cross_R(R) + self.beta * R
-        res  = 0.5 * 1j * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(0, k1 * np.abs(R)) \
+        R_hat = R / la.norm(R)
+        ZxRpB = self.alpha * self.z_cross_R(R_hat) + self.beta * R_hat
+        
+        
+        res  = 0.5 * 1j * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(0, k1 * la.norm(R)) \
                 * (( z - k1*k1/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
-        res -= 0.5      * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(1, k1 * np.abs(R)) \
-                * k1 * (ZxR[0] * self.sigma_x + ZxR[1] * self.sigma_y)
-        res += 0.5 * 1j * np.abs(k2)/self.D_prim(z, k2) * sf.hankel1(0, k2 * np.abs(R)) \
+        res -= 0.5      * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(1, k1 * la.norm(R)) \
+                * k1 * (ZxRpB[0] * self.sigma_x + ZxRpB[1] * self.sigma_y)
+        res += 0.5 * 1j * np.abs(k2)/self.D_prim(z, k2) * sf.hankel1(0, k2 * la.norm(R)) \
                 * (( z - k2*k2/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
-        res -= 0.5      * np.abs(k2)/self.D_prim(z, k2) * sf.hankel1(1, k2 * np.abs(R)) \
-                * k2 * (ZxR[0] * self.sigma_x + ZxR[1] * self.sigma_y)
+        res -= 0.5      * np.abs(k2)/self.D_prim(z, k2) * sf.hankel1(1, k2 * la.norm(R)) \
+                * k2 * (ZxRpB[0] * self.sigma_x + ZxRpB[1] * self.sigma_y)
         return res
 
 
