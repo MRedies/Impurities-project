@@ -2,18 +2,16 @@ import numpy as np
 import scipy.special as sf
 
 
-def hankel1_small_angle(alpha, z):
-    return np.sqrt(2.0/(np.pi * z)) * np.exp(1j * (z - 0.5 * alpha * np.pi - 0.25 * np.pi))
-
 class GF:
-    def __init__(self, m, alpha, beta, B0, eta = 1e-5):
-        self.m     = complex(m,     0)
-        self.alpha = complex(alpha, 0)
-        self.beta  = complex(beta,  0)
-        self.B0    = complex(B0,    0)
-        self.eta   = eta
-        self.E_so  = self.m * (alpha**2 + beta**2)
-        self.E0    = - (self.E_so**2 + self.B0**2)/(2 * self.E_so)
+    def __init__(self, m, alpha, beta, B0, eta = 1e-5, R_to_0 = 1e-6):
+        self.m      = complex(m,     0)
+        self.alpha  = complex(alpha, 0)
+        self.beta   = complex(beta,  0)
+        self.B0     = complex(B0,    0)
+        self.eta    = eta
+        self.R_to_0 = R_to_0
+        self.E_so   = self.m * (alpha**2 + beta**2)
+        self.E0     = - (self.E_so**2 + self.B0**2)/(2 * self.E_so)
 
         self.sigma_0 = np.identity(2)
         self.sigma_x = np.array([[0, 1],[1, 0]])
@@ -55,26 +53,9 @@ class GF:
 
     def N(self, E):
         z = E + 1j * self.eta
-        R = np.array([1e-6, 1e-6])
+        R = np.array([self.R_to_0, self.R_to_0])
         return - 1.0/np.pi * np.imag( np.trace(self.G(R, z)))
 
-    def N_small_angle(self, E):
-        z = E + 1j * self.eta
-        R = np.array([1e-6, 1e-6])
-        return - 1.0/np.pi * np.imag( np.trace(self.G_small_angle(R, z)))
-
-    def G_small_angle(self, R, z):
-        k1, k2 = self.find_k(z)
-        ZxR = self.alpha * self.z_cross_R(R) + self.beta * R
-        res  = 0.5 * 1j * np.abs(k1)/self.D_prim(z, k1) * hankel1_small_angle(0, k1 * np.abs(R)) \
-                * (( z - k1*k1/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
-        res -= 0.5      * np.abs(k1)/self.D_prim(z, k1) * hankel1_small_angle(1, k1 * np.abs(R)) \
-                * k1 * (ZxR[0] * self.sigma_x + ZxR[1] * self.sigma_y)
-        res += 0.5 * 1j * np.abs(k2)/self.D_prim(z, k2) * hankel1_small_angle(0, k2 * np.abs(R)) \
-                * (( z - k2*k2/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
-        res -= 0.5      * np.abs(k2)/self.D_prim(z, k2) * hankel1_small_angle(1, k2 * np.abs(R)) \
-                * k2 * (ZxR[0] * self.sigma_x + ZxR[1] * self.sigma_y)
-        return res
 
     def G(self, R, z):
         k1, k2 = self.find_k(z)
@@ -88,4 +69,6 @@ class GF:
         res -= 0.5      * np.abs(k2)/self.D_prim(z, k2) * sf.hankel1(1, k2 * np.abs(R)) \
                 * k2 * (ZxR[0] * self.sigma_x + ZxR[1] * self.sigma_y)
         return res
+
+
 
