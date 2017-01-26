@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-x   = np.logspace(-2, -9, 5)
+x   = np.logspace(-2, -12, 5)
 E   = np.linspace(-2,8,300)
 DOS = np.zeros(E.shape)
 
