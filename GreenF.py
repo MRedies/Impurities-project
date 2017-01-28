@@ -45,30 +45,35 @@ class GF:
 
         return k1, k2
 
-    def find_k2(self, z):
+    def kp(self, z):
         E = np.real(z)
         eta = np.imag(z)
         inner_sqrt = np.sqrt(1.0 + (eta/(E - self.E0))**2)
         sqrt_w = np.sqrt(2.0 * self.E_so * np.abs(E- self.E0)) \
                *  (        np.sqrt(0.5 * (inner_sqrt + np.sign(E-self.E0))) \
                     + 1j * np.sqrt(0.5 * (inner_sqrt - np.sign(E-self.E0))))
-        kp = np.sqrt(2.0 * self.m * (E + 1j * eta + self.E_so + sqrt_w))
-        km = np.sqrt(2.0 * self.m * (E + 1j * eta + self.E_so - sqrt_w))
-    
-        # if(np.imag(kp) > 0):
-            # k1 =   kp
-        # else:
-            # k1 = - kp
+        return np.sqrt(2.0 * self.m * (E + 1j * eta + self.E_so + sqrt_w))
 
-        # if(np.imag(km) > 0):
-            # k2 =   km
-        # else: 
-            # k2 = - km
-        k1 = kp
-        k2 = km
+    def km(self, z):
+        E = np.real(z)
+        eta = np.imag(z)
+        inner_sqrt = np.sqrt(1.0 + (eta/(E - self.E0))**2)
+        sqrt_w = np.sqrt(2.0 * self.E_so * np.abs(E- self.E0)) \
+               *  (        np.sqrt(0.5 * (inner_sqrt + np.sign(E-self.E0))) \
+                    + 1j * np.sqrt(0.5 * (inner_sqrt - np.sign(E-self.E0))))
+        return np.sqrt(2.0 * self.m * (E + 1j * eta + self.E_so - sqrt_w))
 
-        vec = np.array([kp, -kp, km, -km])
-        plt.plot(np.real(vec), np.imag(vec), 'b.')
+    def find_k2(self, z):
+        if(np.imag(self.kp(z)) > 0):
+            k1 =   self.kp(z)
+        else:
+            k1 = - self.kp(z)
+
+        if(np.imag(self.km(z)) > 0):
+            k2 =   self.km(z)
+        else: 
+            k2 = - self.km(z)
+
 
         return k1, k2
 
@@ -94,9 +99,14 @@ class GF:
         R_hat = R / la.norm(R)
         ZxRpB = self.alpha * self.z_cross_R(R_hat) + self.beta * R_hat
         
-        
-        res  = 0.5 * 1j * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(0, k1 * la.norm(R)) \
-                * (( z - k1*k1/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
+        res = 0 * 1j
+        res += 0.5 * 1j * np.abs(k1) / self.D_prim(z, k1) * sf.hankel1(0, k1 * la.norm(R)) \
+                * (z - k1**2/(2.0 * self.m)) * self.sigma_0
+        # res += 0.5 * 1j * np.abs(k2) / self.D_prim(z, k2) * sf.hankel1(0, k2 * la.norm(R)) \
+                # * (z - k2**2/(2.0 * self.m)) * self.sigma_0
+
+        # res  = 0.5 * 1j * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(0, k1 * la.norm(R)) \
+                # * (( z - k1*k1/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
         # res -= 0.5      * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(1, k1 * la.norm(R)) \
                 # * k1 * (ZxRpB[0] * self.sigma_x + ZxRpB[1] * self.sigma_y)
         # res += 0.5 * 1j * np.abs(k2)/self.D_prim(z, k2) * sf.hankel1(0, k2 * la.norm(R)) \
