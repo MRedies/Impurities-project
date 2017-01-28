@@ -19,6 +19,16 @@ class GF:
         self.sigma_y = np.array([[0, -1j],[1j, 0]])
         self.sigma_z = np.array([[1, 0],[0, -1]])
 
+
+        print("m      = %g + i * %g"%(      np.real(self.m),      np.imag(self.m)))
+        print("alpha  = %g + i * %g"%(  np.real(self.alpha),  np.imag(self.alpha)))
+        print("beta   = %g + i * %g"%(   np.real(self.beta),   np.imag(self.beta)))
+        print("B0     = %g + i * %g"%(     np.real(self.B0),     np.imag(self.B0)))
+        print("eta    = %g + i * %g"%(    np.real(self.eta),    np.imag(self.eta)))
+        print("R_to_0 = %g + i * %g"%( np.real(self.R_to_0), np.imag(self.R_to_0)))
+        print("E_so   = %g + i * %g"%(   np.real(self.E_so),   np.imag(self.E_so)))
+        print("E_0    = %g + i * %g"%(    np.real(self.E0),     np.imag(self.E0)))
+
     def find_k(self, z):
         E   = np.real(z)
         eta = np.imag(z)
@@ -49,18 +59,20 @@ class GF:
         E = np.real(z)
         eta = np.imag(z)
         inner_sqrt = np.sqrt(1.0 + (eta/(E - self.E0))**2)
-        sqrt_w = np.sqrt(2.0 * self.E_so * np.abs(E- self.E0)) \
-               *  (        np.sqrt(0.5 * (inner_sqrt + np.sign(E-self.E0))) \
-                    + 1j * np.sqrt(0.5 * (inner_sqrt - np.sign(E-self.E0))))
+        
+        w = self.E_so**2 + 2 * self.E_so * z + self.B0**2
+        sqrt_w = np.sqrt(w)
+        
         return np.sqrt(2.0 * self.m * (E + 1j * eta + self.E_so + sqrt_w))
 
     def km(self, z):
         E = np.real(z)
         eta = np.imag(z)
         inner_sqrt = np.sqrt(1.0 + (eta/(E - self.E0))**2)
-        sqrt_w = np.sqrt(2.0 * self.E_so * np.abs(E- self.E0)) \
-               *  (        np.sqrt(0.5 * (inner_sqrt + np.sign(E-self.E0))) \
-                    + 1j * np.sqrt(0.5 * (inner_sqrt - np.sign(E-self.E0))))
+        
+        w = self.E_so**2 + 2 * self.E_so * z + self.B0**2
+        sqrt_w = np.sqrt(w) 
+        
         return np.sqrt(2.0 * self.m * (E + 1j * eta + self.E_so - sqrt_w))
 
     def find_k2(self, z):
@@ -95,15 +107,21 @@ class GF:
 
     def G(self, R, z):
         k1, k2 = self.find_k2(z)
-        
         R_hat = R / la.norm(R)
         ZxRpB = self.alpha * self.z_cross_R(R_hat) + self.beta * R_hat
         
+
+        # plt.plot(np.real(z),  np.imag(sf.hankel1(0, k1 * la.norm(R))), '.g')
+        # plt.plot(np.real(z),  np.real(sf.hankel1(0, k2 * la.norm(R))), '.y')
+        # plt.plot(np.real(z),  np.imag(sf.hankel1(0, k2 * la.norm(R))), '.k')
+        # plt.plot(np.real(z),  np.real(k1), '.k')
+        # plt.plot(np.real(z),  np.imag(k1), '.y')
         res = 0 * 1j
-        res += 0.5 * 1j * np.abs(k1) / self.D_prim(z, k1) * sf.hankel1(0, k1 * la.norm(R)) \
-                * (z - k1**2/(2.0 * self.m)) * self.sigma_0
-        # res += 0.5 * 1j * np.abs(k2) / self.D_prim(z, k2) * sf.hankel1(0, k2 * la.norm(R)) \
-                # * (z - k2**2/(2.0 * self.m)) * self.sigma_0
+        res += 0.5 * 1j * np.abs(k1) /np.abs(self.D_prim(z, k1)) * np.real(sf.hankel1(0, k1 * la.norm(R))) \
+                * (z - (k1**2)/(2.0 * self.m)) * self.sigma_0
+        
+        res -= 0.5 * 1j * np.abs(k2) / np.abs(self.D_prim(z, k2)) *np.real(sf.hankel1(0, k2 * la.norm(R))) \
+                 * (z - k2**2/(2.0 * self.m)) * self.sigma_0
 
         # res  = 0.5 * 1j * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(0, k1 * la.norm(R)) \
                 # * (( z - k1*k1/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)

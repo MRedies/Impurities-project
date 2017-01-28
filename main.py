@@ -14,14 +14,6 @@ print("4) m=10, alpha=1, beta=0, B0=0")
 print("5) m=10, alpha=1, beta=0, B0=1")
 
 #parameter
-if len(sys.argv) == 1:
-    i=int(input("set=")) - 1
-elif len(sys.argv) == 2:
-    i = int(sys.argv[1]) - 1
-
-
-
-
 
 E = np.linspace(-10, 20, 500)
 
@@ -34,8 +26,18 @@ sets = np.array([
     [1.0,  1.0,  0.0, 1.0]])
 
 
+if len(sys.argv) == 1:
+    i=int(input("set=")) - 1
+elif len(sys.argv) == 2:
+    i = int(sys.argv[1]) - 1
+elif len(sys.argv) == 5:
+    i = 0
+    for j in range(4):
+        sets[i, j] = float(sys.argv[j+1])
 
-a = GreenF.GF(   sets[i,0], sets[i,1], sets[i,2], sets[i,3], eta = 1e-7)
+
+a = GreenF.GF(   sets[i,0], sets[i,1], sets[i,2], sets[i,3]\
+        , eta = 1e-8, R_to_0 = 1e-8)
 b = DensityN.DOS(sets[i,0], sets[i,1], sets[i,2], sets[i,3])
 
 DOS_G    = np.zeros(E.shape)
@@ -48,12 +50,11 @@ for j in range(E.shape[0]):
     DOS_Npl[j]    = b.Npl(E[j])
     DOS_Nmi[j]    = b.Nmi(E[j])
     DOS_N[j]     = b.N(E[j])
-plt.show()
 
-plt.plot(E, DOS_G, linewidth=2,  label='green')
-plt.plot(E, np.real(DOS_N),   label="DOS")
-plt.plot(E, np.real(DOS_Npl), label='k+ part')
-plt.plot(E, np.real(DOS_Nmi), label='k- part')
+plt.plot(E, DOS_G, 'b-', linewidth=2,  label='green +')
+plt.plot(E, np.real(DOS_N), 'r.',   label="DOS")
+# plt.plot(E, np.real(DOS_Npl),'k.', label='k+ part')
+# plt.plot(E, np.real(DOS_Nmi),'g.', label='k- part')
 
 
 
