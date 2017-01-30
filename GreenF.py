@@ -104,6 +104,29 @@ class GF:
         R = np.array([self.R_to_0, self.R_to_0])
         return - 1.0/np.pi * np.imag( np.trace(self.G(R, z)))
 
+    def Npl(self, E):
+        z = E + 1j * self.eta
+        R = np.array([self.R_to_0, self.R_to_0])
+        return - 1.0/np.pi * np.imag( np.trace(self.Gp(R, z)))
+
+    def Nmi(self, E):
+        z = E + 1j * self.eta
+        R = np.array([self.R_to_0, self.R_to_0])
+        return - 1.0/np.pi * np.imag( np.trace(self.Gm(R, z)))
+
+    def Gp(self, R, z):
+        k1, _= self.find_k2(z)
+        R_hat = R / la.norm(R)
+
+        return  0.5 * 1j * np.real(k1) /((self.D_prim(z, k1))) * np.real(sf.hankel1(0, k1 * la.norm(R))) \
+                * (z - (k1**2)/(2.0 * self.m)) * self.sigma_0
+        
+    def Gm(self, R, z):
+        _, k2 = self.find_k2(z)
+        R_hat = R / la.norm(R)
+
+        return 0.5 * 1j * np.real(k2) /(self.D_prim(z, k2)) * np.real(sf.hankel1(0, k2 * la.norm(R))) \
+                 * (z - k2**2/(2.0 * self.m)) * self.sigma_0
 
     def G(self, R, z):
         k1, k2 = self.find_k2(z)
@@ -111,16 +134,11 @@ class GF:
         ZxRpB = self.alpha * self.z_cross_R(R_hat) + self.beta * R_hat
         
 
-        # plt.plot(np.real(z),  np.imag(sf.hankel1(0, k1 * la.norm(R))), '.g')
-        # plt.plot(np.real(z),  np.real(sf.hankel1(0, k2 * la.norm(R))), '.y')
-        # plt.plot(np.real(z),  np.imag(sf.hankel1(0, k2 * la.norm(R))), '.k')
-        # plt.plot(np.real(z),  np.real(k1), '.k')
-        # plt.plot(np.real(z),  np.imag(k1), '.y')
         res = 0 * 1j
-        res += 0.5 * 1j * np.abs(k1) /np.abs(self.D_prim(z, k1)) * np.real(sf.hankel1(0, k1 * la.norm(R))) \
+        res += 0.5 * 1j * np.real(k1) /((self.D_prim(z, k1))) * np.real(sf.hankel1(0, k1 * la.norm(R))) \
                 * (z - (k1**2)/(2.0 * self.m)) * self.sigma_0
         
-        res -= 0.5 * 1j * np.abs(k2) / np.abs(self.D_prim(z, k2)) *np.real(sf.hankel1(0, k2 * la.norm(R))) \
+        res += 0.5 * 1j * np.real(k2) /(self.D_prim(z, k2)) * np.real(sf.hankel1(0, k2 * la.norm(R))) \
                  * (z - k2**2/(2.0 * self.m)) * self.sigma_0
 
         # res  = 0.5 * 1j * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(0, k1 * la.norm(R)) \

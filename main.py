@@ -41,20 +41,26 @@ a = GreenF.GF(   sets[i,0], sets[i,1], sets[i,2], sets[i,3]\
 b = DensityN.DOS(sets[i,0], sets[i,1], sets[i,2], sets[i,3])
 
 DOS_G    = np.zeros(E.shape)
+DOS_Gmi  = np.zeros(E.shape)
+DOS_Gpl  = np.zeros(E.shape)
 DOS_N    = np.zeros(E.shape, dtype=np.complex_)
 DOS_Npl  = np.zeros(E.shape, dtype=np.complex_)
 DOS_Nmi  = np.zeros(E.shape, dtype=np.complex_)
 
 for j in range(E.shape[0]):
-    DOS_G[j]    = a.N(E[j])
-    DOS_Npl[j]    = b.Npl(E[j])
-    DOS_Nmi[j]    = b.Nmi(E[j])
-    DOS_N[j]     = b.N(E[j])
+    DOS_G[j]   = a.N(E[j])
+    DOS_Gmi[j] = a.Nmi(E[j])
+    DOS_Gpl[j] = a.Npl(E[j])
+    DOS_Npl[j] = b.Npl(E[j])
+    DOS_Nmi[j] = b.Nmi(E[j])
+    DOS_N[j]   = b.N(E[j])
 
-plt.plot(E, DOS_G, 'b-', linewidth=2,  label='green +')
-plt.plot(E, np.real(DOS_N), 'r.',   label="DOS")
-# plt.plot(E, np.real(DOS_Npl),'k.', label='k+ part')
-# plt.plot(E, np.real(DOS_Nmi),'g.', label='k- part')
+plt.plot(E, DOS_G,            'r-', linewidth=1,  label='green ')
+plt.plot(E, DOS_Gpl,          'k-', linewidth=1,  label='green +')
+plt.plot(E, DOS_Gmi,          'g-', linewidth=1,  label='green -')
+plt.plot(E, np.real(DOS_N),   'r.', label="DOS")
+plt.plot(E, np.real(DOS_Npl), 'k.', label='k+ part')
+plt.plot(E, np.real(DOS_Nmi), 'g.', label='k- part')
 
 
 
