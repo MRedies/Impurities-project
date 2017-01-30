@@ -3,6 +3,13 @@ import scipy.special as sf
 import numpy.linalg as la
 import matplotlib.pyplot as plt
 
+def my_Hankel(n, k, abs_R):
+    z = k*k
+    if(np.imag(z) > 0):
+        return  sf.hankel1(n, k * abs_R)
+    else:
+        return -sf.hankel2(n, k * abs_R)
+
 class GF:
     def __init__(self, m, alpha, beta, B0, eta = 1e-5, R_to_0 = 1e-6):
         self.m      = complex(m,     0)
@@ -20,125 +27,74 @@ class GF:
         self.sigma_z = np.array([[1, 0],[0, -1]])
 
 
-        print("m      = %g + i * %g"%(      np.real(self.m),      np.imag(self.m)))
-        print("alpha  = %g + i * %g"%(  np.real(self.alpha),  np.imag(self.alpha)))
-        print("beta   = %g + i * %g"%(   np.real(self.beta),   np.imag(self.beta)))
-        print("B0     = %g + i * %g"%(     np.real(self.B0),     np.imag(self.B0)))
-        print("eta    = %g + i * %g"%(    np.real(self.eta),    np.imag(self.eta)))
-        print("R_to_0 = %g + i * %g"%( np.real(self.R_to_0), np.imag(self.R_to_0)))
-        print("E_so   = %g + i * %g"%(   np.real(self.E_so),   np.imag(self.E_so)))
-        print("E_0    = %g + i * %g"%(    np.real(self.E0),     np.imag(self.E0)))
-
-    def find_k(self, z):
-        E   = np.real(z)
-        eta = np.imag(z)
-        inner_sqrt   = np.sqrt(1 + (eta/(E + self.B0))**2)
-        sgn = np.sign(E - self.E0)
-
-
-        sqrt_w = np.sqrt(self.E_so**2 + 2.0 * self.E_so * z + self.B0**2)
-        kp = np.sqrt(2.0 * self.m * (z + self.E_so + sqrt_w))
-        km = np.sqrt(2.0 * self.m * (z + self.E_so - sqrt_w))
-        
-        if(np.imag(kp) > 0):
-            k1 =   kp
-        else:
-            k1 = - kp
-
-        if(np.imag(km) > 0):
-            k2 =   km
-        else: 
-            k2 = - km
-
-        vec = np.array([kp, -kp, km, -km])
-        plt.plot(np.real(vec), np.imag(vec), 'b.')
-
-        return k1, k2
-
-    def kp(self, z):
-        E = np.real(z)
-        eta = np.imag(z)
-        inner_sqrt = np.sqrt(1.0 + (eta/(E - self.E0))**2)
-        
-        w = self.E_so**2 + 2 * self.E_so * z + self.B0**2
-        sqrt_w = np.sqrt(w)
-        
-        return np.sqrt(2.0 * self.m * (E + 1j * eta + self.E_so + sqrt_w))
-
-    def km(self, z):
-        E = np.real(z)
-        eta = np.imag(z)
-        inner_sqrt = np.sqrt(1.0 + (eta/(E - self.E0))**2)
-        
-        w = self.E_so**2 + 2 * self.E_so * z + self.B0**2
-        sqrt_w = np.sqrt(w) 
-        
-        return np.sqrt(2.0 * self.m * (E + 1j * eta + self.E_so - sqrt_w))
-
-    def find_k2(self, z):
-        if(np.imag(self.kp(z)) > 0):
-            k1 =   self.kp(z)
-        else:
-            k1 = - self.kp(z)
-
-        if(np.imag(self.km(z)) > 0):
-            k2 =   self.km(z)
-        else: 
-            k2 = - self.km(z)
-
-
+    def find_ks(self, z):
+        inner_sqrt = np.sqrt(self.E_so**2 + 2*self.E_so*z + self.B0**2)
+        k1 = np.sqrt(2*self.m * (z + self.E_so + inner_sqrt))
+        k2 = np.sqrt(2*self.m * (z + self.E_so - inner_sqrt))
         return k1, k2
 
     def D(self, z, k):
         ksq_2m = (k**2)/(2.0 * self.m)
         return (z - ksq_2m)**2 - 2 * self.E_so * ksq_2m - self.B0**2
 
-    def D_prim(self, z, k):
-        return k**3/(self.m**2) - 2.0 * k/self.m * (z + self.E_so)
-
     def z_cross_R(self, R):
         return np.array([-R[1], R[0]])
 
     def N(self, E):
-        z = E + 1j * self.eta
         R = np.array([self.R_to_0, self.R_to_0])
-        return - 1.0/np.pi * np.imag( np.trace(self.G(R, z)))
+        return - 1.0/np.pi * np.imag( np.trace(self.G(R, E)))
 
     def Npl(self, E):
-        z = E + 1j * self.eta
         R = np.array([self.R_to_0, self.R_to_0])
-        return - 1.0/np.pi * np.imag( np.trace(self.Gp(R, z)))
+        return - 1.0/np.pi * np.imag( np.trace(self.Gp(R, E)))
 
     def Nmi(self, E):
-        z = E + 1j * self.eta
         R = np.array([self.R_to_0, self.R_to_0])
-        return - 1.0/np.pi * np.imag( np.trace(self.Gm(R, z)))
+        return - 1.0/np.pi * np.imag( np.trace(self.Gm(R, E)))
 
-    def Gp(self, R, z):
-        k1, _= self.find_k2(z)
-        R_hat = R / la.norm(R)
+    def Gp(self, R, E):
+        z = E + self.eta * 1j
+        k1, k2 = self.find_ks(z)
+        abs_R = la.norm(R)
+        
+        fraction1, fraction2 = self.absk_Dpr(E)
 
-        return  0.5 * 1j * np.real(k1) /((self.D_prim(z, k1))) * np.real(sf.hankel1(0, k1 * la.norm(R))) \
+        return 0.5 * 1j * fraction1 * my_Hankel(0, k1, abs_R) \
                 * (z - (k1**2)/(2.0 * self.m)) * self.sigma_0
         
-    def Gm(self, R, z):
-        _, k2 = self.find_k2(z)
-        R_hat = R / la.norm(R)
+    def Gm(self, R, E):
+        z = E + self.eta * 1j
+        k1, k2 = self.find_ks(z)
+        abs_R = la.norm(R)
+        fraction1, fraction2 = self.absk_Dpr(E)
 
-        return 0.5 * 1j * np.real(k2) /(self.D_prim(z, k2)) * np.real(sf.hankel1(0, k2 * la.norm(R))) \
+        return 0.5 * 1j * fraction2 * my_Hankel(0, k2, abs_R) \
                  * (z - k2**2/(2.0 * self.m)) * self.sigma_0
+    
+    def absk_Dpr(self, E):
+        k1, k2 = self.find_ks(E + self.eta)
+        z1 = k1**2 /(2.0 * self.m)
+        z2 = k2**2 /(2.0 * self.m)
 
-    def G(self, R, z):
-        k1, k2 = self.find_k2(z)
+        r1 = self.m/(z1 - z2) 
+        r2 = self.m/(z2 - z1)
+        return r1, r2
+    
+
+    def G(self, R, E):
+        z = E + self.eta * 1j
+        k1, k2 = self.find_ks(z)
         R_hat = R / la.norm(R)
+        abs_R = la.norm(R)
         ZxRpB = self.alpha * self.z_cross_R(R_hat) + self.beta * R_hat
         
+        fraction1, fraction2 = self.absk_Dpr(E)
 
         res = 0 * 1j
-        res += 0.5 * 1j * np.real(k1) /((self.D_prim(z, k1))) * np.real(sf.hankel1(0, k1 * la.norm(R))) \
+        res += 0.5 * 1j * fraction1 * my_Hankel(0, k1, abs_R) \
                 * (z - (k1**2)/(2.0 * self.m)) * self.sigma_0
         
-        res += 0.5 * 1j * np.real(k2) /(self.D_prim(z, k2)) * np.real(sf.hankel1(0, k2 * la.norm(R))) \
+        res += 0.5 * 1j * fraction2 * my_Hankel(0, k2, abs_R) \
                  * (z - k2**2/(2.0 * self.m)) * self.sigma_0
 
         # res  = 0.5 * 1j * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(0, k1 * la.norm(R)) \
