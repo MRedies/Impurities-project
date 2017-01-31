@@ -37,7 +37,7 @@ elif len(sys.argv) == 5:
 
 for i in range(5):
     a = GreenF.GF(   sets[i,0], sets[i,1], sets[i,2], sets[i,3]\
-            , eta = 1e-3, R_to_0 = 1e-3)
+            ,None, eta = 1e-3, R_to_0 = 1e-3)
     b = DensityN.DOS(sets[i,0], sets[i,1], sets[i,2], sets[i,3])
 
     DOS_G    = np.zeros(E.shape)

@@ -2,14 +2,8 @@ import numpy as np
 import numpy.linalg as la
 
 
-def norm(r):
-    sum = 0
-    for x in r:
-        sum += x*x
-    return np.sqrt(sum)
-
 class Imp:
-    def __init__(self, R, V, B, width = 0.01):
+    def __init__(self, R, V, B, width = 0.05):
         self.R     = R
         self.V     = V
         self.B     = B
@@ -31,7 +25,7 @@ class Imp:
             single += self.B[i,1] * self.sigma_y
             single += self.B[i,2] * self.sigma_z
 
-            dR = norm(r - self.R[i,:])
+            dR = la.norm(r - self.R[i,:])
             single *= self.delta_lor(dR)
 
             result += single
