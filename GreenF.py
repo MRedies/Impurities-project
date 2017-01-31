@@ -92,19 +92,14 @@ class GF:
 
         res = 0 * 1j
         res += 0.5 * 1j * fraction1 * my_Hankel(0, k1, abs_R) \
-                * (z - (k1**2)/(2.0 * self.m)) * self.sigma_0
-        
+                * ((z - (k1**2)/(2.0 * self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
         res += 0.5 * 1j * fraction2 * my_Hankel(0, k2, abs_R) \
-                 * (z - k2**2/(2.0 * self.m)) * self.sigma_0
-
-        # res  = 0.5 * 1j * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(0, k1 * la.norm(R)) \
-                # * (( z - k1*k1/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
-        # res -= 0.5      * np.abs(k1)/self.D_prim(z, k1) * sf.hankel1(1, k1 * la.norm(R)) \
-                # * k1 * (ZxRpB[0] * self.sigma_x + ZxRpB[1] * self.sigma_y)
-        # res += 0.5 * 1j * np.abs(k2)/self.D_prim(z, k2) * sf.hankel1(0, k2 * la.norm(R)) \
-                # * (( z - k2*k2/(2*self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
-        # res -= 0.5      * np.abs(k2)/self.D_prim(z, k2) * sf.hankel1(1, k2 * la.norm(R)) \
-                # * k2 * (ZxRpB[0] * self.sigma_x + ZxRpB[1] * self.sigma_y)
+                * ((z - (k2**2)/(2.0 * self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
+        
+        res -= 0.5 * fraction1 * my_Hankel(1, k1, abs_R) \
+                * k1 * (ZxRpB[0] * self.sigma_x + ZxRpB[1] * self.sigma_y)
+        res -= 0.5 * fraction2 * my_Hankel(1, k2, abs_R) \
+                * k2 * (ZxRpB[0] * self.sigma_x + ZxRpB[1] * self.sigma_y)
         return res
 
 
