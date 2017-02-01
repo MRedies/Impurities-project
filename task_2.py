@@ -16,11 +16,12 @@ def plot_den(g,i):
                 r[0] = X[j,k]
                 r[1] = Y[j,k]
                 Z[j,k] = g.dRoh(r, E)
-        cont = axarr[subplot].contourf(X,Y,Z, cmap=cm.viridis)
+        lvls = np.linspace(np.min(Z), np.max(Z), 20)
+        cont = axarr[subplot].contourf(X,Y,Z, cmap=cm.coolwarm)
         f.colorbar(cont, ax=axarr[subplot])
         axarr[subplot].set_ylabel("Set: %d  E = %2.2f"%(i+1,E))
         subplot += 1
-    plt.savefig("plots/task2_den_circ_%03d.pdf"%(i+1))
+    plt.savefig("plots/task2_den_shifted_%03d.pdf"%(i+1))
     plt.close()
     print("%3d density done."%(i+1))
 
@@ -48,28 +49,33 @@ def plot_mag(g,i):
         fig.colorbar(q)
         ax.set_zlim([-1,1])
         ax.set_title("Set %d E = %2.2f"%(i, E))
-        plt.savefig("plots/task2_mag_circ_%03d_E_%2.2f.pdf"%(i+1, E))
+        plt.savefig("plots/task2_mag_shifted_%03d_E_%2.2f.pdf"%(i+1, E))
         plt.close()
     print("%3d magnetization done."%(i+1))
 
-N = 7
+N = 1
 V = 0.23 * np.ones(N)
-R = np.array([[0.0,    1.0],
-              [-0.781, 0.623],
-              [-0.974, -0.222],
-              [-0.433, -0.900],
-              [0.433,  -0.900],
-              [0.974,  -0.222],
-              [0.781,  0.623]])
-B = np.zeros((N,3))
-I = Impurity.Imp(R,V,B)
+R = np.array([[0.0, 0.5]])
+# R = np.array([[0.0,    1.0],
+              # [-0.781, 0.623],
+              # [-0.974, -0.222],
+              # [-0.433, -0.900],
+              # [0.433,  -0.900],
+              # [0.974,  -0.222],
+              # [0.781,  0.623],
+              # [-0.5, 0.0]])
 
-m     = 10.0 * np.ones(N)
+B      = np.zeros((N,3))
+#B[:,2] = V[0]
+
+I      = Impurity.Imp(R,V,B)
+
+m     = 10.0 * np.ones(5)
 alpha = np.array([1E-3, 1.0,  1E-3, 2.0,  1E-3])
 beta  = np.array([1E-3, 1E-3, 1.0,  1E-3, 1.0])
 B0    = np.array([1.0,  0.0,  0.0,  1.0,  2.0])
 
-x = y = np.linspace(-1.2, 1.2, 150)
+x = y = np.linspace(-1.2, 2.2, 150)
 X, Y = np.meshgrid(x,y)
 U = np.zeros(X.shape)
 V = np.zeros(X.shape)
@@ -78,10 +84,10 @@ Z = np.zeros(X.shape)
 r = np.array([0.0, 0.0])
 for i in range(alpha.shape[0]):
     g = GreenF.GF(m[i], alpha[i], beta[i], B0[i], I)
-    #plot_den(g,i)
+    plot_den(g,i)
 
 
-x = y = np.linspace(-1.2, 1.2, 10)
+x = y = np.linspace(-1.2, 2.2, 15)
 X, Y = np.meshgrid(x,y)
 U = np.zeros(X.shape)
 V = np.zeros(X.shape)

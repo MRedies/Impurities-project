@@ -3,7 +3,7 @@ import numpy.linalg as la
 
 
 class Imp:
-    def __init__(self, R, V, B, width = 0.05):
+    def __init__(self, R, V, B, width = 0.1):
         self.R     = R
         self.V     = V
         self.B     = B
