@@ -21,7 +21,7 @@ def plot_den(g,i):
         f.colorbar(cont, ax=axarr[subplot])
         axarr[subplot].set_ylabel("Set: %d  E = %2.2f"%(i+1,E))
         subplot += 1
-    plt.savefig("plots/task2_den_shifted_%03d.pdf"%(i+1))
+    plt.savefig("plots/task3Z_den_shifted_%03d.pdf"%(i+1))
     plt.close()
     print("%3d density done."%(i+1))
 
@@ -30,6 +30,7 @@ def plot_mag(g,i):
     subplot = 0
     Z.fill(0.0)
     length = np.zeros(Z.shape)
+    print("INDEX: %d"%(i+1))
     for E in [-1.0, 0.0, 1.0]:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
@@ -40,16 +41,24 @@ def plot_mag(g,i):
                 tmp = g.dMs(r, E)
                 
                 length[j,k] = la.norm(tmp)
+                if length[j,k] < 1e-6:
+                    length[j,k] = 1e-6
                 U[j,k] = tmp[0]
                 V[j,k] = tmp[1]
                 W[j,k] = tmp[2]
+        # print(U)
+        # print(V)
+        # print(W)
+        print("U: min %g, max %g, mean %g"%(np.min(U), np.max(U), np.mean(U)))
+        print("V: min %g, max %g, mean %g"%(np.min(V), np.max(V), np.mean(V)))
+        print("W: min %g, max %g, mean %g \n \n"%(np.min(W), np.max(W), np.mean(W)))
         q = ax.quiver(X,Y,Z,U,V,W, cmap=cm.brg, length=0.2, 
-                pivot='middle', clim=[-1,1])
+                pivot='middle')
         q.set_array((W/length ).flatten())
         fig.colorbar(q)
         ax.set_zlim([-1,1])
         ax.set_title("Set %d E = %2.2f"%(i, E))
-        plt.savefig("plots/task2_mag_shifted_%03d_E_%2.2f.pdf"%(i+1, E))
+        plt.savefig("plots/task3Z_mag_shifted_%03d_E_%2.2f.pdf"%(i+1, E))
         plt.close()
     print("%3d magnetization done."%(i+1))
 
@@ -66,7 +75,7 @@ R = np.array([[0.0, 0.5]])
               # [-0.5, 0.0]])
 
 B      = np.zeros((N,3))
-#B[:,2] = V[0]
+B[:,2] = V[0]
 
 I      = Impurity.Imp(R,V,B)
 
@@ -75,16 +84,16 @@ alpha = np.array([1E-3, 1.0,  1E-3, 2.0,  1E-3])
 beta  = np.array([1E-3, 1E-3, 1.0,  1E-3, 1.0])
 B0    = np.array([1.0,  0.0,  0.0,  1.0,  2.0])
 
-x = y = np.linspace(-1.2, 2.2, 150)
-X, Y = np.meshgrid(x,y)
-U = np.zeros(X.shape)
-V = np.zeros(X.shape)
-W = np.zeros(X.shape)
-Z = np.zeros(X.shape)
-r = np.array([0.0, 0.0])
-for i in range(alpha.shape[0]):
-    g = GreenF.GF(m[i], alpha[i], beta[i], B0[i], I)
-    plot_den(g,i)
+# x = y = np.linspace(-1.2, 1.2, 150)
+# X, Y = np.meshgrid(x,y)
+# U = np.zeros(X.shape)
+# V = np.zeros(X.shape)
+# W = np.zeros(X.shape)
+# Z = np.zeros(X.shape)
+# r = np.array([0.0, 0.0])
+# for i in range(alpha.shape[0]):
+    # g = GreenF.GF(m[i], alpha[i], beta[i], B0[i], I)
+    # plot_den(g,i)
 
 
 x = y = np.linspace(-1.2, 2.2, 15)

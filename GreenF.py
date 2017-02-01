@@ -78,10 +78,14 @@ class GF:
                 * k2 * (ZxRpB[0] * self.sigma_x + ZxRpB[1] * self.sigma_y)
         return res
 
-    def dG(self, R, E):
-        poly  = np.dot(self.Impur.d_H(R), self.Gc(R,E))
-        poly += np.dot(poly, poly)
-        return np.dot(self.Gc(R,E), poly)
+    def dG(self, r, E):
+        result = np.zeros((2,2), dtype=np.complex_)
+        
+        for n in range(self.Impur.n_imp):
+            R       = self.Impur.R[n,:]
+            tmp     = np.dot(self.Impur.An(n), self.Gc(R-r,E))
+            result += np.dot(self.Gc(r-R,E), tmp)
+        return result
 
     def dRoh(self, R, E):
         return -1.0/np.pi * np.imag( np.trace(self.dG(R,E)))

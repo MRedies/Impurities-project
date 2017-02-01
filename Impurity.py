@@ -8,6 +8,7 @@ class Imp:
         self.V     = V
         self.B     = B
         self.width = width
+        self.n_imp = V.shape[0]
 
         self.sigma_0 = np.identity(2, dtype=np.complex_)
         self.sigma_x = np.array([[0, 1],[1, 0]], dtype=np.complex_)
@@ -31,7 +32,16 @@ class Imp:
             result += single
 
         return result
+    
+    def An(self, n):
+        result = np.zeros((2,2), dtype=np.complex_)
+        
+        result += self.V[n]   * self.sigma_0
+        result += self.B[n,0] * self.sigma_x
+        result += self.B[n,1] * self.sigma_y
+        result += self.B[n,2] * self.sigma_z
 
+        return result 
     def delta_lor(self, t):
         return 1.0/np.pi * self.width /(t**2 + self.width**2)
 
