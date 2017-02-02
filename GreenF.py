@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.special as sf
 import numpy.linalg as la
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 def my_Hankel(n, k, abs_R):
     z = k*k
