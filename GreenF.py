@@ -66,7 +66,7 @@ class GF:
         
         fraction1, fraction2 = self.absk_Dpr(E)
 
-        res = 0 * 1j
+        res  = 0 * 1j
         res += 0.5 * 1j * fraction1 * my_Hankel(0, k1, abs_R) \
                 * ((z - (k1**2)/(2.0 * self.m)) * self.sigma_0 + self.B0 * self.sigma_z)
         res += 0.5 * 1j * fraction2 * my_Hankel(0, k2, abs_R) \

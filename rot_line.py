@@ -40,7 +40,7 @@ R = np.array([[0.0, 0.0]])
               # [-0.5, 0.0]])
 
 B      = np.zeros((N,3))
-#B[:,0] = V[0]
+B[:,0] = V[0]
 
 I      = Impurity.Imp(R,V,B)
 
@@ -55,6 +55,7 @@ for i in range(5):
     for theta in t:
         g = GreenF.GF(m[i], alpha[i], beta[i], B0[i], I, eta=1e-6, R_to_0=1e-3)
         plot_line(g, E, theta)
+        plt.title("Set = %d, E = %f"%(i+1, E))
     plt.legend()
     plt.show()
 

@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy.linalg as la
+from scipy import integrate
+import scipy.optimize as optimize
 from mpl_toolkits.mplot3d import Axes3D
 import GreenF
 import Impurity
@@ -213,41 +215,83 @@ def create_mag_plot_contour(g,x,y, Set, E, comm):
             axarr[1,1].set_title("Z-component")
             plt.show()
 
-comm   = MPI.COMM_WORLD
-rank   = comm.Get_rank()
-nprocs = comm.Get_size()
+def circumf(a,b, end):
+    U = lambda t:  np.sqrt( a**2 * ( np.sin(t)**2 + b**2/(a**2) * np.cos(t)**2))
+    res, err = integrate.quad(U, 0, end)
+    return res
 
-# init values
-N = 1
-V = 0.23 * np.ones(N)
-R = np.array([[0.0, 0.5]])
-# R = np.array([[0.0,    1.0],
-              # [-0.781, 0.623],
-              # [-0.974, -0.222],
-              # [-0.433, -0.900],
-              # [0.433,  -0.900],
-              # [0.974,  -0.222],
-              # [0.781,  0.623],
-              # [-0.5,   0.0]])
+def ellipse(a,b,n):
+    x = lambda t: a * np.cos(t)
+    y = lambda t: b * np.sin(t)
+    
+    U     = circumf(a,b,2 * np.pi)
+    U_arr = np.linspace(0.0, U, n+1)[:-1]
+    dU    = U_arr[1] - U_arr[0]
 
-B      = np.zeros((N,3))
-#B[:,0] = V[0]
+    x_arr = np.zeros(n)
+    y_arr = np.zeros(n)
 
-I      = Impurity.Imp(R,V,B)
+    x_arr[0] = x(0.0)
+    y_arr[0] = y(0.0)
 
-m     = 10.0 * np.ones(5)
-alpha = np.array([1E-3, 1.0,  1E-3, 2.0,  1E-3 ])
-beta  = np.array([1E-3, 1E-3, 1.0,  1E-3, 1.0])
-B0    = np.array([1.0,  0.0,  0.0,  1.0,  2.0])
+    for i in range(1,n):
+        f        = lambda t: circumf(a,b,t) - i*dU
+        print(circumf(a,b,0.0) - i*dU)
+        print("i*dU = %f"%(i*dU))
+        print("f(0) = %f   f(2pi) = %f"%(f(0.0), f(2 * np.pi)))
+        t        = optimize.bisect(f, 0.0, 2.0 * np.pi)
+        x_arr[i] = x(t)
+        y_arr[i] = y(t)
+
+    return x_arr, y_arr
+
+def foc(a,b):
+    return np.sqrt(a**2 - b**2)
+
+a = 10.0
+b = 4.0
+x,y = ellipse(a,b,71)
+plt.plot(x,y,'.')
+plt.axes().set_aspect('equal', 'datalim')
+plt.show()
 
 
-dim_num = 150
-x = y = np.linspace(-1.2, 1.2, dim_num)
+
+# comm   = MPI.COMM_WORLD
+# rank   = comm.Get_rank()
+# nprocs = comm.Get_size()
+
+# # init values
+# N = 1
+# V = 0.23 * np.ones(N)
+# R = np.array([[0.0, 0.5]])
+# # R = np.array([[0.0,    1.0],
+              # # [-0.781, 0.623],
+              # # [-0.974, -0.222],
+              # # [-0.433, -0.900],
+              # # [0.433,  -0.900],
+              # # [0.974,  -0.222],
+              # # [0.781,  0.623],
+              # # [-0.5,   0.0]])
+
+# B      = np.zeros((N,3))
+# #B[:,0] = V[0]
+
+# I      = Impurity.Imp(R,V,B)
+
+# m     = 10.0 * np.ones(5)
+# alpha = np.array([1E-3, 1.0,  1E-3, 2.0,  1E-3 ])
+# beta  = np.array([1E-3, 1E-3, 1.0,  1E-3, 1.0])
+# B0    = np.array([1.0,  0.0,  0.0,  1.0,  2.0])
 
 
-E = np.array([-1.0, 0.0, 1.0])
-for i in range(alpha.shape[0]):
-        g = GreenF.GF(m[i], alpha[i], beta[i], B0[i], I)
-        #create_mag_plot_stream(g,x,y,i,E,comm)
-        create_den_plot(g,x,y, i, E, comm)
-        print("[%2d]: %d"%(rank,i))
+# dim_num = 150
+# x = y = np.linspace(-0.8, 0.8, dim_num)
+
+
+# E = np.array([-1.0, 0.0, 1.0])
+# for i in range(alpha.shape[0]):
+        # g = GreenF.GF(m[i], alpha[i], beta[i], B0[i], I)
+        # create_mag_plot_contour(g,x,y,i,E,comm)
+        # create_den_plot(g,x,y, i, E, comm)
+        # print("[%2d]: %d"%(rank,i))
