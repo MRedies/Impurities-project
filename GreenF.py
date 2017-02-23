@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.special as sf
 import numpy.linalg as la
+import time
 #import matplotlib.pyplot as plt
 
 def my_Hankel(n, k, abs_R):
@@ -11,13 +12,14 @@ def my_Hankel(n, k, abs_R):
         return -sf.hankel2(n, k * abs_R)
 
 class GF:
-    def __init__(self, m, alpha, beta, B0, Impur,
+    def __init__(self, m, alpha, beta, B0, Impur, E, mag,
             Ef =1.0, eta = 1e-5, R_to_0 = 1e-6):
         self.m      = complex(m,     0)
         self.alpha  = complex(alpha, 0)
         self.beta   = complex(beta,  0)
         self.B0     = complex(B0,    0)
         self.Impur  = Impur
+        self.E      = complex(np.real(E), eta)
         self.Ef     = Ef
         self.eta    = eta
         self.R_to_0 = R_to_0
@@ -29,6 +31,12 @@ class GF:
         self.sigma_y = np.array([[0, -1j],[1j, 0]])
         self.sigma_z = np.array([[1, 0],[0, -1]])
 
+        time1 = time.time()
+        self.set_invT(mag)
+        time2 = time.time()
+        print("Time: %f"%(time2-time1))
+
+        print("n = %d"%(self.Impur.n_imp))
 
     def find_ks(self, z):
         inner_sqrt = np.sqrt(self.E_so**2 + 2*self.E_so*z + self.B0**2)
@@ -43,12 +51,14 @@ class GF:
     def z_cross_R(self, R):
         return np.array([-R[1], R[0]])
 
-    def N(self, E):
+    def N(self):
+        E = self.E
         R = np.array([self.R_to_0, self.R_to_0])
         return - 1.0/np.pi * np.imag( np.trace(self.Gc(R, E)))
 
     
-    def absk_Dpr(self, E):
+    def absk_Dpr(self):
+        E = self.E
         k1, k2 = self.find_ks(E + self.eta)
         z1 = k1**2 /(2.0 * self.m)
         z2 = k2**2 /(2.0 * self.m)
@@ -57,14 +67,15 @@ class GF:
         r2 = self.m/(z2 - z1)
         return r1, r2
 
-    def Gc(self, R, E):
+    def Gc(self, R):
+        E = self.E
         z = E + self.eta * 1j
         k1, k2 = self.find_ks(z)
         R_hat = R / la.norm(R)
         abs_R = la.norm(R)
         ZxRpB = self.alpha * self.z_cross_R(R_hat) + self.beta * R_hat
         
-        fraction1, fraction2 = self.absk_Dpr(E)
+        fraction1, fraction2 = self.absk_Dpr()
 
         res  = 0 * 1j
         res += 0.5 * 1j * fraction1 * my_Hankel(0, k1, abs_R) \
@@ -78,21 +89,37 @@ class GF:
                 * k2 * (ZxRpB[0] * self.sigma_x + ZxRpB[1] * self.sigma_y)
         return res
 
-    def dG(self, r, E):
-        result = np.zeros((2,2), dtype=np.complex_)
-        
-        for n in range(self.Impur.n_imp):
-            R       = self.Impur.R[n,:]
-            tmp     = np.dot(self.Impur.An(n), self.Gc(R-r,E))
-            result += np.dot(self.Gc(r-R,E), tmp)
+
+    def to_Rs(self, rx):
+        result = np.zeros((2, 2*self.Impur.n_imp), 
+                     dtype=np.complex_)
+        for i in range(self.Impur.n_imp):
+            mtx_i = 2 * i
+            dR = self.Impur.R[:,i] - rx
+            result[:,mtx_i:mtx_i+2] = self.Gc(dR)
         return result
 
-    def dRoh(self, R, E):
-        return -1.0/np.pi * np.imag( np.trace(self.dG(R,E)))
+    def from_Rs(self, ry):
+        result = np.zeros((2*self.Impur.n_imp,2),
+                    dtype=np.complex_)
+        for i in range(self.Impur.n_imp):
+            mtx_i = 2 * i
+            dR = ry - self.Impur.R[:,i]
+            result[mtx_i:mtx_i+2,:] = self.Gc(dR)
+        return result
 
-    def dMs(self, R, E):
+    def G(self, rx, ry):
+        M = np.dot(self.to_Rs(rx), self.Impur.T)
+        return np.dot(M, self.from_Rs(ry))
+
+    def Roh(self, R):
+        E = self.E
+        return -1.0/np.pi * np.imag( np.trace(self.G(R)))
+
+    def Ms(self, R):
+        E = self.E
         result = np.zeros(3, dtype=np.float_)
-        G_tmp = self.dG(R,E)
+        G_tmp = self.G(R)
 
         result[0] = np.imag(np.trace(np.dot(self.sigma_x, G_tmp)))
         result[1] = np.imag(np.trace(np.dot(self.sigma_y, G_tmp)))
@@ -100,13 +127,47 @@ class GF:
 
         result *= -1.0 / np.pi
         return result
+    
 
     def I(self, R, V, m_tip):
-        current = self.dRoh(R, self.Ef + V)
-        current += np.inner(m_tip, self.dMs(R, self.Ef + V))
+        current = self.Roh(R)
+        current += np.inner(m_tip, self.dMs(R))
         return current
+    
+    def set_invT(self, mag):
+        E = self.E
+        self.set_Gpart()
+        self.Impur.set_diagT(mag)
+        self.Impur.T = la.inv(self.Impur.T)
+
+    def set_Gpart(self):
+        E = self.E
+        mtx = self.Impur.T
+        Rs  = self.Impur.R
+        for i in range(0, self.Impur.n_imp):
+            mtx_i = 2*i
+            for j in range(0, self.Impur.n_imp):
+                mtx_j = 2*j
+                if(i != j):
+                    dR = Rs[i,:] - Rs[j,:]
+                    mtx[mtx_i:mtx_i+2,mtx_j:mtx_j+2] = -self.Gc(dR)
 
 # CODE THAT IS LIKE NOT TO BE USED AGAIN
+    def dRoh(self, R):
+        E = self.E
+        return -1.0/np.pi * np.imag( np.trace(self.dG(R,E)))
+
+    def dMs(self, R):
+        E = self.E
+        result = np.zeros(3, dtype=np.float_)
+        G_tmp = self.dG(R)
+
+        result[0] = np.imag(np.trace(np.dot(self.sigma_x, G_tmp)))
+        result[1] = np.imag(np.trace(np.dot(self.sigma_y, G_tmp)))
+        result[2] = np.imag(np.trace(np.dot(self.sigma_z, G_tmp)))
+
+        result *= -1.0 / np.pi
+        return result
 
     def Npl(self, E):
         R = np.array([self.R_to_0, self.R_to_0])
@@ -134,3 +195,13 @@ class GF:
 
         return 0.5 * 1j * fraction2 * my_Hankel(0, k2, abs_R) \
                  * (z - k2**2/(2.0 * self.m)) * self.sigma_0
+    
+    def dG(self, r):
+        E = self.E
+        result = np.zeros((2,2), dtype=np.complex_)
+        
+        for n in range(self.Impur.n_imp):
+            R       = self.Impur.R[n,:]
+            tmp     = np.dot(self.Impur.An(n), self.Gc(R-r))
+            result += np.dot(self.Gc(r-R), tmp)
+        return result

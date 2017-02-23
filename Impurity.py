@@ -10,6 +10,9 @@ class Imp:
         self.width = width
         self.n_imp = V.shape[0]
 
+        self.T     = np.zeros((2*self.n_imp, 2*self.n_imp),
+                        dtype=np.complex_)
+
         self.sigma_0 = np.identity(2, dtype=np.complex_)
         self.sigma_x = np.array([[0, 1],[1, 0]], dtype=np.complex_)
         self.sigma_y = np.array([[0, -1j],[1j, 0]], dtype=np.complex_)
@@ -48,3 +51,17 @@ class Imp:
     def delta_gau(self, t):
         return 1.0/(np.sqrt(2.0 * np.pi) * self.width) \
                 * np.exp(-t**2 /(2.0 * self.width**2))
+
+    def set_diagT(self,mag):
+        for i in range(0, 2*self.n_imp, 2):
+            self.T[i:i+2,i:i+2] = self.inv_t(i, mag)
+
+    def inv_t(self,n, mag):
+        if(mag     == False):
+            return 1j * self.sigma_0
+        else:
+            b_norm  = 1.0 / la.norm(self.B[n,:])
+            t       = 1j * b_norm * B[n,0] * self.sigma_x
+            t      += 1j * b_norm * B[n,1] * self.sigma_y
+            t      += 1j * b_norm * B[n,2] * self.sigma_z
+            return t
