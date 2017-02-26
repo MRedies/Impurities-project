@@ -52,16 +52,18 @@ class Imp:
         return 1.0/(np.sqrt(2.0 * np.pi) * self.width) \
                 * np.exp(-t**2 /(2.0 * self.width**2))
 
-    def set_diagT(self,mag):
+    def set_diagT(self, m, mag):
         for i in range(0, 2*self.n_imp, 2):
-            self.T[i:i+2,i:i+2] = self.inv_t(i, mag)
+            n = int(i/2)
+            self.T[i:i+2,i:i+2] = self.inv_t(n, m, mag)
 
-    def inv_t(self,n, mag):
-        if(mag     == False):
-            return 1j * self.sigma_0
+    def inv_t(self,n,m, mag):
+        if(mag  == False):
+            t = 1j * self.sigma_0
         else:
             b_norm  = 1.0 / la.norm(self.B[n,:])
-            t       = 1j * b_norm * B[n,0] * self.sigma_x
-            t      += 1j * b_norm * B[n,1] * self.sigma_y
-            t      += 1j * b_norm * B[n,2] * self.sigma_z
-            return t
+            t       = 1j * b_norm * self.B[n,0] * self.sigma_x
+            t      += 1j * b_norm * self.B[n,1] * self.sigma_y
+            t      += 1j * b_norm * self.B[n,2] * self.sigma_z
+        #print("m = %f + i %f"%(np.real(m), np.imag(m) ))
+        return t/(0.7 * m)

@@ -19,7 +19,7 @@ def line(g,x,E, theta):
         r      = np.array([0.0, 0.0])
         r[0]   = x[i]
         r      = np.dot(M,r)
-        roh[i] = g.dRoh(r, E)
+        roh[i] = g.Roh(r)
     return roh
 
 def plot_line(g,E, theta):
@@ -52,8 +52,8 @@ t = np.linspace(0, 2 * np.pi, 5)
 
 E = 2.5
 for i in range(5):
+    g = GreenF.GF(m[i], alpha[i], beta[i], B0[i], I,E, True)
     for theta in t:
-        g = GreenF.GF(m[i], alpha[i], beta[i], B0[i], I, eta=1e-6, R_to_0=1e-3)
         plot_line(g, E, theta)
         plt.title("Set = %d, E = %f"%(i+1, E))
     plt.legend()
